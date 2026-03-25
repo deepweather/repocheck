@@ -18,6 +18,19 @@ import Patterns from "./components/Patterns";
 import Ownership from "./components/Ownership";
 import Compare from "./components/Compare";
 import Health from "./components/Health";
+import CodeCity from "./components/CodeCity";
+
+type Tab = "overview" | "contributors" | "patterns" | "health" | "ownership" | "commits" | "city";
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: "overview", label: "Overview" },
+  { id: "contributors", label: "Contributors" },
+  { id: "patterns", label: "Patterns" },
+  { id: "health", label: "Health" },
+  { id: "ownership", label: "Ownership" },
+  { id: "commits", label: "Commits" },
+  { id: "city", label: "City" },
+];
 
 export default function App() {
   const [data, setData] = useState<RepoMetrics | null>(null);
@@ -26,6 +39,7 @@ export default function App() {
   const [repoPath, setRepoPath] = useState("");
   const [diffSha, setDiffSha] = useState<string | null>(null);
   const [recents, setRecents] = useState<RecentRepo[]>(getRecents);
+  const [tab, setTab] = useState<Tab>("overview");
   const headerRef = useRef<HeaderHandle>(null);
 
   const handleAnalyze = useCallback(async (repo: string, branch: string, maxCommits: number) => {
@@ -33,6 +47,7 @@ export default function App() {
     setError(null);
     setData(null);
     setRepoPath(repo);
+    setTab("overview");
     try {
       const result = await analyzeRepo(repo, branch || undefined, maxCommits);
       setData(result);
@@ -69,7 +84,21 @@ export default function App() {
     <div className="app">
       <Header ref={headerRef} onAnalyze={handleAnalyze} onReset={handleReset} loading={loading} />
 
-      <main className="container">
+      {data && (
+        <nav className="tab-bar">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              className={`tab-btn ${tab === t.id ? "tab-btn--active" : ""}`}
+              onClick={() => setTab(t.id)}
+            >
+              {t.label}
+            </button>
+          ))}
+        </nav>
+      )}
+
+      <main className={tab === "city" && data ? "container container--full" : "container"}>
         {!data && (
           <EmptyState
             loading={loading}
@@ -80,49 +109,59 @@ export default function App() {
           />
         )}
 
-        {data && (
+        {data && tab === "overview" && (
           <>
             <StatsGrid data={data} />
-
             <div className="charts-row">
               <TypeDistributionChart data={data} />
               <VelocityChart data={data} />
             </div>
-
             <div className="charts-row">
               <FeatureBugChart data={data} />
               <ImpactChart data={data} />
             </div>
+          </>
+        )}
 
+        {data && tab === "contributors" && (
+          <>
             <Leaderboard
               contributors={data.contributors}
               commits={reversedCommits}
               onSelectCommit={setDiffSha}
             />
-
-            {data.analytics && (
-              <>
-                <Compare contributors={data.contributors} />
-                <Patterns temporal={data.analytics.temporal} />
-                <Health health={data.analytics.health} />
-                <Ownership ownership={data.analytics.ownership} commits={reversedCommits} onSelectCommit={setDiffSha} />
-              </>
-            )}
-
-            <CommitList
-              commits={reversedCommits}
-              onSelectCommit={setDiffSha}
-              title="All Commits"
-            />
+            <Compare contributors={data.contributors} />
           </>
+        )}
+
+        {data && tab === "patterns" && data.analytics && (
+          <Patterns temporal={data.analytics.temporal} />
+        )}
+
+        {data && tab === "health" && data.analytics && (
+          <Health health={data.analytics.health} />
+        )}
+
+        {data && tab === "ownership" && data.analytics && (
+          <Ownership ownership={data.analytics.ownership} commits={reversedCommits} onSelectCommit={setDiffSha} />
+        )}
+
+        {data && tab === "commits" && (
+          <CommitList
+            commits={reversedCommits}
+            onSelectCommit={setDiffSha}
+            title="All Commits"
+          />
+        )}
+
+        {data && tab === "city" && (
+          <CodeCity commits={data.commits} />
         )}
       </main>
 
       {diffSha && repoPath && (
         <DiffViewer repoPath={repoPath} sha={diffSha} onClose={() => setDiffSha(null)} />
       )}
-
-      <footer className="footer">repocheck</footer>
     </div>
   );
 }

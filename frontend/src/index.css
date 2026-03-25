@@ -280,6 +280,41 @@ body {
 .btn-primary:hover { box-shadow: 0 4px 12px rgba(139,124,246,0.3); }
 
 /* ================================================================
+   TAB BAR
+   ================================================================ */
+.tab-bar {
+  display: flex;
+  gap: 2px;
+  padding: 0 var(--space-xl);
+  padding-left: 88px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+
+.tab-btn {
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color 0.12s;
+  margin-bottom: -1px;
+}
+
+.tab-btn:hover { color: var(--text-secondary); }
+
+.tab-btn--active {
+  color: var(--text);
+  border-bottom-color: var(--accent);
+}
+
+/* ================================================================
    CONTAINER + LAYOUT
    ================================================================ */
 .container {
@@ -287,6 +322,23 @@ body {
   margin: 0 auto;
   padding: var(--space-lg) var(--space-xl);
 }
+
+.container--full {
+  max-width: none;
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.container { overflow-y: auto; }
 
 /* ================================================================
    EMPTY STATE
@@ -667,11 +719,11 @@ body {
 .bad { color: var(--red); }
 
 /* ================================================================
-   FOOTER
+   FOOTER (hidden when tabs are active)
    ================================================================ */
 .footer {
   text-align: center;
-  padding: var(--space-xl);
+  padding: var(--space-lg);
   color: var(--text-tertiary);
   font-size: 12px;
 }
@@ -993,6 +1045,101 @@ body {
 .diff-hunk { background: var(--accent-dim); }
 .diff-hunk .diff-line-text { color: var(--accent); font-weight: 500; }
 .diff-meta .diff-line-text { color: var(--text-tertiary); font-weight: 600; }
+
+/* ================================================================
+   CODE CITY (3D)
+   ================================================================ */
+.code-city {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 0;
+}
+
+.code-city__canvas {
+  flex: 1;
+  height: calc(100vh - 110px);
+}
+
+.code-city__canvas canvas {
+  display: block;
+}
+
+.code-city__controls {
+  position: absolute;
+  top: var(--space-md);
+  left: var(--space-md);
+  right: var(--space-md);
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  pointer-events: none;
+}
+
+.code-city__controls > * { pointer-events: auto; }
+
+.code-city__modes {
+  display: flex;
+  gap: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.code-city__mode {
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  text-transform: capitalize;
+  transition: all 0.12s;
+}
+
+.code-city__mode:hover { color: var(--text-secondary); }
+
+.code-city__mode--active {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.code-city__tooltip {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  max-width: 400px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.code-city__tooltip strong {
+  font-size: 13px;
+  color: var(--text);
+  font-family: var(--mono);
+  word-break: break-all;
+}
+
+.code-city__legend {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+}
 
 /* ================================================================
    ANALYTICS SECTIONS (shared)
