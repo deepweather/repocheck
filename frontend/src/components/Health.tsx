@@ -21,16 +21,14 @@ function useChart(deps: any[], factory: () => any) {
   return canvasRef;
 }
 
-const CHART_OPTS = {
-  responsive: true,
-  scales: {
-    x: { ticks: { color: "#5e5e6e", font: { size: 11 }, maxTicksLimit: 12, maxRotation: 0 }, grid: { display: false } },
-    y: { ticks: { color: "#5e5e6e", font: { size: 11 } }, grid: { color: "rgba(255,255,255,0.04)" } },
-  },
-  plugins: {
-    legend: { display: false },
-    tooltip: { backgroundColor: "#222226", borderColor: "rgba(255,255,255,0.1)", borderWidth: 1, titleColor: "#ececf0", bodyColor: "#9494a0" },
-  },
+const TOOLTIP = {
+  backgroundColor: "#222226",
+  borderColor: "rgba(255,255,255,0.1)",
+  borderWidth: 1,
+  titleColor: "#ececf0",
+  bodyColor: "#9494a0",
+  cornerRadius: 6,
+  padding: 10,
 };
 
 export default function Health({ health }: Props) {
@@ -41,17 +39,27 @@ export default function Health({ health }: Props) {
     data: {
       labels: weeks,
       datasets: [{
-        label: "Bug ratio",
         data: health.weekly.map((w) => w.bug_ratio),
         borderColor: "#f47067",
         backgroundColor: "rgba(244,112,103,0.06)",
         fill: true,
         tension: 0.3,
         pointRadius: 0,
+        pointHoverRadius: 4,
+        pointHoverBackgroundColor: "#f47067",
         borderWidth: 2,
       }],
     },
-    options: CHART_OPTS,
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: { mode: "index", intersect: false },
+      scales: {
+        x: { ticks: { color: "#5e5e6e", font: { size: 10 }, maxTicksLimit: 8, maxRotation: 0 }, grid: { display: false } },
+        y: { beginAtZero: true, max: 1, ticks: { color: "#5e5e6e", font: { size: 10 } }, grid: { color: "rgba(255,255,255,0.04)" } },
+      },
+      plugins: { legend: { display: false }, tooltip: TOOLTIP },
+    },
   }));
 
   const complexityRef = useChart([health], () => new Chart(complexityRef.current, {
@@ -59,17 +67,27 @@ export default function Health({ health }: Props) {
     data: {
       labels: weeks,
       datasets: [{
-        label: "Avg complexity",
         data: health.weekly.map((w) => w.complexity_avg),
         borderColor: "#8b7cf6",
         backgroundColor: "rgba(139,124,246,0.06)",
         fill: true,
         tension: 0.3,
         pointRadius: 0,
+        pointHoverRadius: 4,
+        pointHoverBackgroundColor: "#8b7cf6",
         borderWidth: 2,
       }],
     },
-    options: CHART_OPTS,
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      interaction: { mode: "index", intersect: false },
+      scales: {
+        x: { ticks: { color: "#5e5e6e", font: { size: 10 }, maxTicksLimit: 8, maxRotation: 0 }, grid: { display: false } },
+        y: { beginAtZero: true, ticks: { color: "#5e5e6e", font: { size: 10 } }, grid: { color: "rgba(255,255,255,0.04)" } },
+      },
+      plugins: { legend: { display: false }, tooltip: TOOLTIP },
+    },
   }));
 
   const sizeEntries = Object.entries(health.commit_size_distribution);
@@ -89,16 +107,27 @@ export default function Health({ health }: Props) {
         borderRadius: 3,
       }],
     },
-    options: { ...CHART_OPTS, plugins: { ...CHART_OPTS.plugins, legend: { display: false } } },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      scales: {
+        x: { ticks: { color: "#5e5e6e", font: { size: 10 } }, grid: { display: false } },
+        y: { beginAtZero: true, ticks: { color: "#5e5e6e", font: { size: 10 } }, grid: { color: "rgba(255,255,255,0.04)" } },
+      },
+      plugins: { legend: { display: false }, tooltip: TOOLTIP },
+    },
   }));
+
+  // Only show meaningful attrition flags (not -100% which just means inactive)
+  const meaningfulFlags = health.attrition_flags.filter((a) => a.drop_pct < 100 && a.historical_velocity > 0.5);
 
   return (
     <section className="analytics-section">
       <h2 className="section-title">Health</h2>
 
-      {health.attrition_flags.length > 0 && (
+      {meaningfulFlags.length > 0 && (
         <div className="attrition-alerts">
-          {health.attrition_flags.map((a) => (
+          {meaningfulFlags.map((a) => (
             <div key={a.author_id} className="attrition-alert">
               <span className="attrition-alert__name">{a.name}</span>
               <span className="attrition-alert__drop bad">-{a.drop_pct}%</span>
@@ -112,11 +141,11 @@ export default function Health({ health }: Props) {
 
       <div className="health-charts">
         <div className="chart-card">
-          <h3>Bug ratio trend</h3>
+          <h3>Bug ratio</h3>
           <canvas ref={bugRatioRef} />
         </div>
         <div className="chart-card">
-          <h3>Complexity trend</h3>
+          <h3>Complexity</h3>
           <canvas ref={complexityRef} />
         </div>
         <div className="chart-card">
