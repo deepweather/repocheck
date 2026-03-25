@@ -135,7 +135,7 @@ export default function App() {
         )}
 
         {data && tab === "patterns" && data.analytics && (
-          <Patterns temporal={data.analytics.temporal} />
+          <Patterns temporal={data.analytics.temporal} commits={reversedCommits} onSelectCommit={setDiffSha} />
         )}
 
         {data && tab === "health" && data.analytics && (
