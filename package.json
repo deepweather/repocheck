@@ -1,0 +1,41 @@
+{
+  "name": "repocheck",
+  "version": "0.1.0",
+  "description": "AI-powered git analytics dashboard",
+  "main": "electron/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --mac",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "pyinstaller repocheck.spec --noconfirm",
+    "build:all": "npm run build:frontend && npm run build:backend && npm run dist"
+  },
+  "devDependencies": {
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
+  },
+  "build": {
+    "appId": "com.repocheck.app",
+    "productName": "repocheck",
+    "files": [
+      "electron/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "dist/repocheck-backend",
+        "to": "backend",
+        "filter": ["**/*"]
+      }
+    ],
+    "mac": {
+      "target": ["dmg"],
+      "category": "public.app-category.developer-tools",
+      "darkModeSupport": true
+    },
+    "dmg": {
+      "title": "repocheck",
+      "artifactName": "repocheck-${version}.${ext}"
+    }
+  }
+}
