@@ -46,19 +46,25 @@ export default function EmptyState({ loading, error, onSelectRepo, recents, onSe
 
   if (loading) {
     return (
-      <div className="skeleton-container">
-        <div className="skeleton-grid">
-          <div className="skeleton skeleton--hero" />
-          <div className="skeleton" />
-          <div className="skeleton" />
-          <div className="skeleton" />
-          <div className="skeleton" />
-          <div className="skeleton" />
-          <div className="skeleton" />
+      <div className="loading-view">
+        <div className="loading-view__status">
+          <div className="spinner" />
+          <span>Analyzing repository…</span>
         </div>
-        <div className="skeleton-charts">
-          <div className="skeleton skeleton--chart" />
-          <div className="skeleton skeleton--chart" />
+        <div className="skeleton-container">
+          <div className="skeleton-grid">
+            <div className="skeleton skeleton--hero" />
+            <div className="skeleton" />
+            <div className="skeleton" />
+            <div className="skeleton" />
+            <div className="skeleton" />
+            <div className="skeleton" />
+            <div className="skeleton" />
+          </div>
+          <div className="skeleton-charts">
+            <div className="skeleton skeleton--chart" />
+            <div className="skeleton skeleton--chart" />
+          </div>
         </div>
       </div>
     );

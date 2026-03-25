@@ -435,11 +435,23 @@ body {
 
 @media (min-width: 600px) { .quick-repo__path { display: block; } }
 
-.skeleton-container {
+.loading-view {
   max-width: 1280px;
   margin: 0 auto;
-  padding: var(--space-lg) 0;
+  padding: var(--space-xl) var(--space-xl);
+  animation: fadeIn 0.2s ease-out;
 }
+
+.loading-view__status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.skeleton-container { width: 100%; }
 
 .skeleton-grid {
   display: grid;
@@ -453,7 +465,7 @@ body {
 
 .skeleton {
   background: var(--surface);
-  height: 80px;
+  height: 100px;
   position: relative;
   overflow: hidden;
 }
@@ -462,8 +474,8 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent 0%, var(--surface2) 50%, transparent 100%);
-  animation: shimmer 1.5s infinite;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.03) 50%, transparent 100%);
+  animation: shimmer 2s ease-in-out infinite;
 }
 
 @keyframes shimmer {
@@ -475,6 +487,7 @@ body {
   grid-column: span 2;
   grid-row: span 2;
   height: auto;
+  min-height: 200px;
 }
 
 .skeleton-charts {
@@ -484,7 +497,7 @@ body {
 }
 
 .skeleton--chart {
-  height: 200px;
+  height: 260px;
   border-radius: var(--radius);
 }
 
