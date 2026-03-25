@@ -35,9 +35,20 @@ def load_config() -> dict:
     return dict(DEFAULTS)
 
 
+def _clean_key(key: str) -> str:
+    """Strip env var prefixes if someone pastes 'OPENAI_API_KEY=sk-...'."""
+    for prefix in ("OPENAI_API_KEY=", "ANTHROPIC_API_KEY="):
+        if key.startswith(prefix):
+            key = key[len(prefix) :]
+    return key.strip()
+
+
 def save_config(data: dict) -> None:
     _ensure_dir()
     current = load_config()
+    for k in ("openai_api_key", "anthropic_api_key"):
+        if k in data and data[k]:
+            data[k] = _clean_key(data[k])
     current.update(data)
     CONFIG_FILE.write_text(json.dumps(current, indent=2))
     log.info("Config saved to %s", CONFIG_FILE)
