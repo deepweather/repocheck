@@ -317,28 +317,28 @@ body {
 /* ================================================================
    CONTAINER + LAYOUT
    ================================================================ */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
 .container {
   max-width: 1280px;
   margin: 0 auto;
   padding: var(--space-lg) var(--space-xl);
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .container--full {
   max-width: none;
   padding: 0;
-  flex: 1;
   display: flex;
   flex-direction: column;
-}
-
-.app {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
   overflow: hidden;
 }
-
-.container { overflow-y: auto; }
 
 /* ================================================================
    EMPTY STATE
@@ -739,7 +739,7 @@ body {
   .dev-card__main { grid-template-columns: 28px 1fr; }
   .dev-metrics { grid-column: 1 / -1; justify-content: flex-start; padding-top: 8px; }
   .header { padding: 14px 20px; }
-  .container { padding: var(--space-md); }
+  .container:not(.container--full) { padding: var(--space-md); }
 }
 
 @media (max-width: 640px) {
@@ -815,6 +815,7 @@ body {
   background: var(--surface);
   border-radius: var(--radius);
   overflow: hidden;
+  min-width: 0;
 }
 
 .commit-row {
@@ -826,6 +827,7 @@ body {
   transition: background 0.08s;
   font-size: 13px;
   border-bottom: 1px solid var(--border);
+  min-width: 0;
 }
 
 .commit-row:last-child { border-bottom: none; }
@@ -1059,7 +1061,7 @@ body {
 
 .code-city__canvas {
   flex: 1;
-  height: calc(100vh - 110px);
+  min-height: 0;
 }
 
 .code-city__canvas canvas {
@@ -1190,6 +1192,7 @@ body {
   border-radius: var(--radius);
   padding: var(--space-lg);
   overflow: hidden;
+  width: 100%;
 }
 
 .heatmap-hours, .heatmap-row {
@@ -1220,9 +1223,9 @@ body {
 }
 
 .heatmap-cell {
-  height: 18px;
+  height: 28px;
   min-width: 0;
-  border-radius: 2px;
+  border-radius: 3px;
   background: var(--accent);
   cursor: crosshair;
   transition: transform 0.1s;

@@ -172,9 +172,16 @@ export default function CodeCity({ commits }: { commits: CommitInfo[] }) {
       sceneRef.current = null;
     }
 
-    const width = container.clientWidth;
-    const height = container.clientHeight;
-    if (width === 0 || height === 0) return;
+    // Wait for layout to resolve so container has real dimensions
+    const width = container.clientWidth || container.offsetWidth || 800;
+    const height = container.clientHeight || container.offsetHeight || 600;
+    if (width < 10 || height < 10) {
+      const timer = setTimeout(() => {
+        // Re-trigger by setting a dummy state
+        setHovered(null);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color("#111113");
