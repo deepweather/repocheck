@@ -1,4 +1,4 @@
-const { app, BrowserWindow, dialog } = require("electron");
+const { app, BrowserWindow, Menu, dialog, shell } = require("electron");
 const { spawn, execSync } = require("child_process");
 const path = require("path");
 const http = require("http");
@@ -95,16 +95,112 @@ async function startBackend() {
 
 function killBackend() {
   if (!backendProcess) return;
-
-  try {
-    backendProcess.kill("SIGTERM");
-  } catch {}
-
+  try { backendProcess.kill("SIGTERM"); } catch {}
   setTimeout(() => {
     if (backendProcess) {
       try { backendProcess.kill("SIGKILL"); } catch {}
     }
   }, 3000);
+}
+
+function buildMenu() {
+  const template = [
+    {
+      label: app.name,
+      submenu: [
+        { role: "about" },
+        { type: "separator" },
+        { role: "hide" },
+        { role: "hideOthers" },
+        { role: "unhide" },
+        { type: "separator" },
+        { role: "quit" },
+      ],
+    },
+    {
+      label: "File",
+      submenu: [
+        {
+          label: "Open Repository…",
+          accelerator: "CmdOrCtrl+O",
+          click: async () => {
+            const result = await dialog.showOpenDialog(mainWindow, {
+              properties: ["openDirectory"],
+              message: "Select a git repository",
+            });
+            if (!result.canceled && result.filePaths.length > 0) {
+              const repoPath = result.filePaths[0];
+              mainWindow.webContents.executeJavaScript(
+                `document.querySelector('input[placeholder*="repository"]').value = ${JSON.stringify(repoPath)};` +
+                `document.querySelector('input[placeholder*="repository"]').dispatchEvent(new Event('input', {bubbles: true}));` +
+                `document.querySelector('input[placeholder*="repository"]').dispatchEvent(new Event('change', {bubbles: true}));`
+              );
+            }
+          },
+        },
+        {
+          label: "Home",
+          accelerator: "CmdOrCtrl+Shift+H",
+          click: () => {
+            if (mainWindow && backendPort) {
+              mainWindow.loadURL(`http://127.0.0.1:${backendPort}`);
+            }
+          },
+        },
+        { type: "separator" },
+        {
+          label: "Clear Cache",
+          click: () => {
+            if (backendPort) {
+              http.request({
+                hostname: "127.0.0.1", port: backendPort,
+                path: "/api/cache/clear", method: "POST",
+              }).end();
+            }
+          },
+        },
+        { type: "separator" },
+        { role: "close" },
+      ],
+    },
+    {
+      label: "Edit",
+      submenu: [
+        { role: "undo" },
+        { role: "redo" },
+        { type: "separator" },
+        { role: "cut" },
+        { role: "copy" },
+        { role: "paste" },
+        { role: "selectAll" },
+      ],
+    },
+    {
+      label: "View",
+      submenu: [
+        { role: "reload" },
+        { role: "forceReload" },
+        { role: "toggleDevTools" },
+        { type: "separator" },
+        { role: "resetZoom" },
+        { role: "zoomIn" },
+        { role: "zoomOut" },
+        { type: "separator" },
+        { role: "togglefullscreen" },
+      ],
+    },
+    {
+      label: "Window",
+      submenu: [
+        { role: "minimize" },
+        { role: "zoom" },
+        { type: "separator" },
+        { role: "front" },
+      ],
+    },
+  ];
+
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 }
 
 function createWindow() {
@@ -115,8 +211,9 @@ function createWindow() {
     minHeight: 600,
     title: "repocheck",
     titleBarStyle: "hiddenInset",
-    trafficLightPosition: { x: 16, y: 16 },
+    trafficLightPosition: { x: 16, y: 14 },
     backgroundColor: "#111113",
+    icon: path.join(__dirname, "..", "assets", "icon.icns"),
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       nodeIntegration: false,
@@ -140,6 +237,8 @@ app.whenReady().then(async () => {
     app.quit();
     return;
   }
+
+  buildMenu();
 
   try {
     await startBackend();

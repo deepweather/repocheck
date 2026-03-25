@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" rx="228" fill="#111113"/>
+  <rect x="40" y="40" width="944" height="944" rx="200" fill="#19191d"/>
+  <text x="512" y="420" text-anchor="middle" font-family="SF Pro Display, Helvetica Neue, Arial" font-size="320" font-weight="700" fill="#ececf0">repo</text>
+  <text x="512" y="720" text-anchor="middle" font-family="SF Pro Display, Helvetica Neue, Arial" font-size="320" font-weight="700" fill="#8b7cf6">check</text>
+</svg>

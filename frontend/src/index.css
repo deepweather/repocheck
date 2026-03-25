@@ -47,11 +47,22 @@ body {
    ================================================================ */
 .header {
   padding: 16px var(--space-xl);
+  padding-left: 88px;
   display: flex;
   align-items: center;
   gap: var(--space-md);
   flex-wrap: wrap;
   background: var(--surface);
+  -webkit-app-region: drag;
+}
+
+.header input,
+.header button,
+.header select,
+.header .input-wrapper,
+.header .branch-wrapper,
+.header .commit-presets {
+  -webkit-app-region: no-drag;
 }
 
 .logo {
