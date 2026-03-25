@@ -25,20 +25,33 @@ export default function Settings({ onSaved, isOnboarding }: Props) {
       .catch(() => {});
   }, []);
 
+  const [saveError, setSaveError] = useState<string | null>(null);
+
   const save = async () => {
     setSaving(true);
-    const params = new URLSearchParams();
-    if (provider) params.set("provider", provider);
-    if (openaiKey) params.set("openai_api_key", openaiKey);
-    if (anthropicKey) params.set("anthropic_api_key", anthropicKey);
+    setSaveError(null);
+    try {
+      const body: Record<string, string> = {};
+      if (provider) body.provider = provider;
+      if (openaiKey) body.openai_api_key = openaiKey;
+      if (anthropicKey) body.anthropic_api_key = anthropicKey;
 
-    await fetch(`/api/settings?${params}`, { method: "POST" });
-    setSaving(false);
-    setSaved(true);
-    if (openaiKey) setHasOpenai(true);
-    if (anthropicKey) setHasAnthropic(true);
-    setTimeout(() => setSaved(false), 2000);
-    onSaved?.();
+      const res = await fetch("/api/settings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error("Save failed");
+      setSaved(true);
+      if (openaiKey) setHasOpenai(true);
+      if (anthropicKey) setHasAnthropic(true);
+      setTimeout(() => setSaved(false), 2000);
+      onSaved?.();
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : "Failed to save");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -101,6 +114,8 @@ export default function Settings({ onSaved, isOnboarding }: Props) {
           />
         </div>
       )}
+
+      {saveError && <p className="bad" style={{ fontSize: 13, marginBottom: 12 }}>{saveError}</p>}
 
       <div className="settings__actions">
         <button

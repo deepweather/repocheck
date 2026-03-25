@@ -435,6 +435,59 @@ body {
 
 @media (min-width: 600px) { .quick-repo__path { display: block; } }
 
+.skeleton-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: var(--space-lg) 0;
+}
+
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: var(--space-lg);
+}
+
+.skeleton {
+  background: var(--surface);
+  height: 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, var(--surface2) 50%, transparent 100%);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.skeleton--hero {
+  grid-column: span 2;
+  grid-row: span 2;
+  height: auto;
+}
+
+.skeleton-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.skeleton--chart {
+  height: 200px;
+  border-radius: var(--radius);
+}
+
 .spinner {
   width: 24px;
   height: 24px;
@@ -937,6 +990,12 @@ body {
   justify-content: center;
   padding: 20px;
   backdrop-filter: blur(8px);
+  animation: fadeIn 0.12s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .diff-modal {
@@ -1049,6 +1108,15 @@ body {
 .diff-hunk { background: var(--accent-dim); }
 .diff-hunk .diff-line-text { color: var(--accent); font-weight: 500; }
 .diff-meta .diff-line-text { color: var(--text-tertiary); font-weight: 600; }
+
+.diff-truncated {
+  padding: 16px 20px;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
 
 /* ================================================================
    SETTINGS
@@ -1176,6 +1244,91 @@ body {
   justify-content: center;
   padding: 20px;
   backdrop-filter: blur(8px);
+  animation: fadeIn 0.15s ease-out;
+}
+
+/* ================================================================
+   COMMAND PALETTE
+   ================================================================ */
+.palette-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 3000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 15vh;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.1s ease-out;
+}
+
+.palette {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  overflow: hidden;
+  animation: slideUp 0.12s ease-out;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.palette__input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  padding: 16px 20px;
+  outline: none;
+}
+
+.palette__input::placeholder { color: var(--text-tertiary); }
+
+.palette__results {
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.palette__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background 0.06s;
+}
+
+.palette__item--active { background: var(--surface2); }
+
+.palette__item-label {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.palette__item-detail {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  margin-left: var(--space-md);
+}
+
+.palette__empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: 14px;
 }
 
 .onboarding-modal {

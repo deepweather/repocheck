@@ -102,6 +102,8 @@ export default function Compare({ contributors }: Props) {
     return () => { chartRef.current?.destroy(); };
   }, [selected, contributors, maxes]);
 
+  if (contributors.length < 2) return null;
+
   return (
     <section className="analytics-section">
       <div className="analytics-section__header">

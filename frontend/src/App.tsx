@@ -20,6 +20,7 @@ import Compare from "./components/Compare";
 import Health from "./components/Health";
 import CodeCity from "./components/CodeCity";
 import Settings from "./components/Settings";
+import CommandPalette from "./components/CommandPalette";
 
 type Tab = "overview" | "contributors" | "patterns" | "health" | "ownership" | "commits" | "city" | "settings";
 
@@ -41,8 +42,16 @@ export default function App() {
   const [repoPath, setRepoPath] = useState("");
   const [diffSha, setDiffSha] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showPalette, setShowPalette] = useState(false);
   const [recents, setRecents] = useState<RecentRepo[]>(getRecents);
-  const [tab, setTab] = useState<Tab>("overview");
+  const [tab, setTabState] = useState<Tab>(() => {
+    const hash = window.location.hash.replace("#", "") as Tab;
+    return TABS.some((t) => t.id === hash) ? hash : "overview";
+  });
+  const setTab = useCallback((t: Tab) => {
+    setTabState(t);
+    window.location.hash = t;
+  }, []);
   const headerRef = useRef<HeaderHandle>(null);
 
   useEffect(() => {
@@ -54,6 +63,15 @@ export default function App() {
         }
       })
       .catch(() => {});
+
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setShowPalette((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   const handleAnalyze = useCallback(async (repo: string, branch: string, maxCommits: number) => {
@@ -80,6 +98,7 @@ export default function App() {
     setData(null);
     setError(null);
     setRepoPath("");
+    setTab("overview");
   }, []);
 
   const handleSelectRepo = useCallback((path: string) => {
@@ -179,6 +198,16 @@ export default function App() {
 
       {diffSha && repoPath && (
         <DiffViewer repoPath={repoPath} sha={diffSha} onClose={() => setDiffSha(null)} />
+      )}
+
+      {showPalette && (
+        <CommandPalette
+          onClose={() => setShowPalette(false)}
+          onNavigateTab={(t) => setTab(t as Tab)}
+          onSelectCommit={setDiffSha}
+          contributors={data?.contributors || []}
+          commits={reversedCommits}
+        />
       )}
 
       {showOnboarding && (

@@ -39,7 +39,7 @@ const CHART_DEFAULTS = {
   },
 };
 
-function useChart(factory: () => any) {
+function useChart(deps: any[], factory: () => any) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<any>(null);
 
@@ -48,7 +48,7 @@ function useChart(factory: () => any) {
     chartRef.current?.destroy();
     chartRef.current = factory();
     return () => { chartRef.current?.destroy(); };
-  });
+  }, deps); // eslint-disable-line react-hooks/exhaustive-deps
 
   return canvasRef;
 }
@@ -60,7 +60,7 @@ interface Props {
 export function TypeDistributionChart({ data }: Props) {
   const entries = Object.entries(data.commit_type_distribution).sort((a, b) => b[1] - a[1]);
 
-  const ref = useChart(() => new Chart(ref.current, {
+  const ref = useChart([data], () => new Chart(ref.current, {
     type: "doughnut",
     data: {
       labels: entries.map(([k]) => k.charAt(0).toUpperCase() + k.slice(1)),
@@ -92,7 +92,7 @@ export function TypeDistributionChart({ data }: Props) {
 export function VelocityChart({ data }: Props) {
   const weeks = Object.keys(data.weekly_timeline).sort();
 
-  const ref = useChart(() => new Chart(ref.current, {
+  const ref = useChart([data], () => new Chart(ref.current, {
     type: "bar",
     data: {
       labels: weeks,
@@ -141,7 +141,7 @@ export function VelocityChart({ data }: Props) {
 export function FeatureBugChart({ data }: Props) {
   const weeks = Object.keys(data.weekly_timeline).sort();
 
-  const ref = useChart(() => new Chart(ref.current, {
+  const ref = useChart([data], () => new Chart(ref.current, {
     type: "line",
     data: {
       labels: weeks,
@@ -191,7 +191,7 @@ export function ImpactChart({ data }: Props) {
   const labels = top.map((c) => c.name.length > 18 ? c.name.slice(0, 17) + "…" : c.name);
   const scores = top.map((c) => Math.round(c.impact_score * 10) / 10);
 
-  const ref = useChart(() => new Chart(ref.current, {
+  const ref = useChart([data], () => new Chart(ref.current, {
     type: "bar",
     data: {
       labels,

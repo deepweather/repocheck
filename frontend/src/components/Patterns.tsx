@@ -109,7 +109,7 @@ export default function Patterns({ temporal, commits, onSelectCommit }: Props) {
         ))}
       </div>
 
-      {selectedCell && cellCommits.length > 0 && (
+      {selectedCell && (
         <div className="heatmap-detail">
           <div className="heatmap-detail__header">
             <h3>{DAYS[selectedCell.day]} {selectedCell.hour}:00–{selectedCell.hour}:59</h3>
@@ -136,6 +136,11 @@ export default function Patterns({ temporal, commits, onSelectCommit }: Props) {
           </div>
 
           <div className="heatmap-detail__commits">
+            {cellCommits.length === 0 && (
+              <div className="heatmap-detail__commit" style={{ color: "var(--text-tertiary)", cursor: "default", justifyContent: "center" }}>
+                No commits in this time slot
+              </div>
+            )}
             {cellCommits.slice(0, 20).map((c) => (
               <div key={c.sha} className="heatmap-detail__commit" onClick={() => onSelectCommit(c.sha)}>
                 <span className="heatmap-detail__commit-sha">{c.short_sha}</span>

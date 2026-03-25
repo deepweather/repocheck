@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 from git import Repo
 from git.exc import GitCommandError
@@ -190,21 +190,12 @@ async def get_settings():
 
 
 @app.post("/api/settings")
-async def update_settings(
-    provider: str = Query(""),
-    openai_api_key: str = Query(""),
-    anthropic_api_key: str = Query(""),
-    model: str = Query(""),
-):
+async def update_settings(request: Request):
+    body = await request.json()
     updates = {}
-    if provider:
-        updates["provider"] = provider
-    if openai_api_key:
-        updates["openai_api_key"] = openai_api_key
-    if anthropic_api_key:
-        updates["anthropic_api_key"] = anthropic_api_key
-    if model is not None:
-        updates["model"] = model
+    for key in ("provider", "openai_api_key", "anthropic_api_key", "model"):
+        if key in body and body[key]:
+            updates[key] = body[key]
     save_config(updates)
     return {"ok": True}
 

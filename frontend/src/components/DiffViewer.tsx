@@ -8,12 +8,48 @@ interface Props {
   onClose: () => void;
 }
 
-function classifyLine(line: string): string {
-  if (line.startsWith("+++") || line.startsWith("---")) return "diff-meta";
-  if (line.startsWith("@@")) return "diff-hunk";
-  if (line.startsWith("+")) return "diff-add";
-  if (line.startsWith("-")) return "diff-del";
-  return "diff-ctx";
+const MAX_LINES = 2000;
+
+interface DiffLine {
+  text: string;
+  type: string;
+  lineNum: string;
+}
+
+function parseDiff(raw: string): DiffLine[] {
+  const lines = raw.split("\n");
+  const result: DiffLine[] = [];
+  let oldLine = 0;
+  let newLine = 0;
+
+  for (let i = 0; i < Math.min(lines.length, MAX_LINES); i++) {
+    const line = lines[i];
+
+    if (line.startsWith("@@")) {
+      const match = line.match(/@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
+      if (match) {
+        oldLine = parseInt(match[1], 10);
+        newLine = parseInt(match[2], 10);
+      }
+      result.push({ text: line, type: "diff-hunk", lineNum: "" });
+    } else if (line.startsWith("+++") || line.startsWith("---")) {
+      result.push({ text: line, type: "diff-meta", lineNum: "" });
+    } else if (line.startsWith("+")) {
+      result.push({ text: line, type: "diff-add", lineNum: String(newLine) });
+      newLine++;
+    } else if (line.startsWith("-")) {
+      result.push({ text: line, type: "diff-del", lineNum: String(oldLine) });
+      oldLine++;
+    } else if (line.startsWith("diff ")) {
+      result.push({ text: line, type: "diff-meta", lineNum: "" });
+    } else {
+      result.push({ text: line, type: "diff-ctx", lineNum: String(newLine) });
+      oldLine++;
+      newLine++;
+    }
+  }
+
+  return result;
 }
 
 export default function DiffViewer({ repoPath, sha, onClose }: Props) {
@@ -29,6 +65,17 @@ export default function DiffViewer({ repoPath, sha, onClose }: Props) {
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
   }, [repoPath, sha]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const diffLines = data ? parseDiff(data.diff) : [];
+  const truncated = data && data.diff.split("\n").length > MAX_LINES;
 
   return (
     <div className="diff-overlay" onClick={onClose}>
@@ -55,12 +102,17 @@ export default function DiffViewer({ repoPath, sha, onClose }: Props) {
             )}
             {data.stat && <pre className="diff-stat">{data.stat}</pre>}
             <div className="diff-content">
-              {data.diff.split("\n").map((line, i) => (
-                <div key={i} className={`diff-line ${classifyLine(line)}`}>
-                  <span className="diff-line-num">{i + 1}</span>
-                  <span className="diff-line-text">{line}</span>
+              {diffLines.map((dl, i) => (
+                <div key={i} className={`diff-line ${dl.type}`}>
+                  <span className="diff-line-num">{dl.lineNum}</span>
+                  <span className="diff-line-text">{dl.text}</span>
                 </div>
               ))}
+              {truncated && (
+                <div className="diff-line diff-truncated">
+                  Diff truncated — showing first {MAX_LINES} lines
+                </div>
+              )}
             </div>
           </>
         )}
