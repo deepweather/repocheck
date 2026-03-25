@@ -1161,6 +1161,64 @@ body {
 
 .ownership-row:hover { background: var(--surface2); margin: 0 -8px; padding-left: 8px; padding-right: 8px; border-radius: 4px; }
 
+.ownership-row--clickable { cursor: pointer; }
+.ownership-row--open { background: var(--surface2); margin: 0 -8px; padding-left: 8px; padding-right: 8px; border-radius: 4px 4px 0 0; border-bottom: none; }
+
+.ownership-row__toggle {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  width: 12px;
+  flex-shrink: 0;
+}
+
+.hotspot-commits {
+  background: var(--bg);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  margin: 0 -8px 4px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.hotspot-commit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 6px 20px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.08s;
+}
+
+.hotspot-commit:hover { background: var(--surface); }
+.hotspot-commit--empty { color: var(--text-tertiary); cursor: default; justify-content: center; padding: 12px; }
+
+.hotspot-commit__sha {
+  font-family: var(--mono);
+  color: var(--text-tertiary);
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.hotspot-commit__msg {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.hotspot-commit__author {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.hotspot-commit__date {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  width: 50px;
+  text-align: right;
+}
+
 .ownership-row:last-child { border-bottom: none; }
 .ownership-row__dir { font-weight: 600; min-width: 100px; font-family: var(--mono); font-size: 12px; }
 .ownership-row__file { flex: 1; font-family: var(--mono); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

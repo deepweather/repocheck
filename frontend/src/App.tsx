@@ -105,7 +105,7 @@ export default function App() {
                 <Compare contributors={data.contributors} />
                 <Patterns temporal={data.analytics.temporal} />
                 <Health health={data.analytics.health} />
-                <Ownership ownership={data.analytics.ownership} />
+                <Ownership ownership={data.analytics.ownership} commits={reversedCommits} onSelectCommit={setDiffSha} />
               </>
             )}
 
