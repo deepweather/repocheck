@@ -13,7 +13,8 @@ class TestHealthEndpoint:
         assert r.status_code == 200
         data = r.json()
         assert data["status"] == "ok"
-        assert "has_openai_key" in data
+        assert "has_api_key" in data
+        assert "provider" in data
 
 
 class TestBrowseEndpoint:

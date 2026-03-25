@@ -1049,6 +1049,144 @@ body {
 .diff-meta .diff-line-text { color: var(--text-tertiary); font-weight: 600; }
 
 /* ================================================================
+   SETTINGS
+   ================================================================ */
+.settings {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--space-xl) 0;
+}
+
+.settings--onboarding {
+  padding: 0;
+}
+
+.settings__welcome {
+  margin-bottom: var(--space-lg);
+}
+
+.settings__welcome h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.settings__welcome p {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  line-height: 1.5;
+}
+
+.settings__section {
+  margin-bottom: var(--space-lg);
+}
+
+.settings__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-sm);
+}
+
+.settings__saved-badge {
+  font-size: 10px;
+  color: var(--green);
+  background: var(--green-dim);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+.settings__radios {
+  display: flex;
+  gap: 2px;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.settings__radio {
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all 0.12s;
+  flex: 1;
+  text-align: center;
+}
+
+.settings__radio:hover { color: var(--text-secondary); }
+
+.settings__radio--active {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.settings__input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.settings__input:focus { border-color: var(--accent); }
+.settings__input::placeholder { color: var(--text-tertiary); }
+
+.settings__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.settings__skip {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 0;
+}
+
+.settings__skip:hover { color: var(--text-secondary); }
+
+/* Onboarding overlay */
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(8px);
+}
+
+.onboarding-modal {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: var(--space-xl);
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+
+/* ================================================================
    CODE CITY (3D)
    ================================================================ */
 .code-city {

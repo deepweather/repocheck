@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import logging
-import os
 from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
@@ -18,6 +17,7 @@ from git.exc import GitCommandError
 from .analytics import compute_all_analytics
 from .cache import get_cached, put_cache, clear_cache
 from .classifier import classify_commits
+from .config import get_active_api_key, load_config, save_config
 from .extractor import extract_commits
 from .metrics import compute_metrics
 
@@ -84,10 +84,14 @@ def analyze(
     except Exception as e:
         raise HTTPException(400, f"Failed to read repository: {e}")
 
+    provider, api_key, resolved_model = get_active_api_key()
+
     classified = classify_commits(
         commits,
-        openai_api_key=os.environ.get("OPENAI_API_KEY"),
-        model=model,
+        openai_api_key=api_key if provider == "openai" else None,
+        anthropic_api_key=api_key if provider == "anthropic" else None,
+        model=resolved_model or model,
+        provider=provider or "openai",
     )
 
     metrics = compute_metrics(classified, repo_path=repo_str)
@@ -165,7 +169,44 @@ async def list_branches(repo: str = Query(...)):
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "has_openai_key": bool(os.environ.get("OPENAI_API_KEY"))}
+    provider, key, model = get_active_api_key()
+    return {
+        "status": "ok",
+        "has_api_key": bool(key),
+        "provider": provider,
+        "model": model,
+    }
+
+
+@app.get("/api/settings")
+async def get_settings():
+    cfg = load_config()
+    return {
+        "provider": cfg.get("provider", ""),
+        "has_openai_key": bool(cfg.get("openai_api_key")),
+        "has_anthropic_key": bool(cfg.get("anthropic_api_key")),
+        "model": cfg.get("model", ""),
+    }
+
+
+@app.post("/api/settings")
+async def update_settings(
+    provider: str = Query(""),
+    openai_api_key: str = Query(""),
+    anthropic_api_key: str = Query(""),
+    model: str = Query(""),
+):
+    updates = {}
+    if provider:
+        updates["provider"] = provider
+    if openai_api_key:
+        updates["openai_api_key"] = openai_api_key
+    if anthropic_api_key:
+        updates["anthropic_api_key"] = anthropic_api_key
+    if model is not None:
+        updates["model"] = model
+    save_config(updates)
+    return {"ok": True}
 
 
 @app.get("/api/browse")

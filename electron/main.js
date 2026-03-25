@@ -149,6 +149,18 @@ function buildMenu() {
         },
         { type: "separator" },
         {
+          label: "Settings…",
+          accelerator: "CmdOrCtrl+,",
+          click: () => {
+            if (mainWindow && backendPort) {
+              mainWindow.webContents.executeJavaScript(
+                `document.querySelector('[class*="tab-btn"]')?.closest('nav')?.querySelectorAll('button').forEach(b => { if(b.textContent==='Settings') b.click(); });`
+              );
+            }
+          },
+        },
+        { type: "separator" },
+        {
           label: "Clear Cache",
           click: () => {
             if (backendPort) {

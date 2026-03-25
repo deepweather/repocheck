@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { RepoMetrics } from "./types";
 import { analyzeRepo } from "./api";
 import { addRecent, getRecents, type RecentRepo } from "./recents";
@@ -19,8 +19,9 @@ import Ownership from "./components/Ownership";
 import Compare from "./components/Compare";
 import Health from "./components/Health";
 import CodeCity from "./components/CodeCity";
+import Settings from "./components/Settings";
 
-type Tab = "overview" | "contributors" | "patterns" | "health" | "ownership" | "commits" | "city";
+type Tab = "overview" | "contributors" | "patterns" | "health" | "ownership" | "commits" | "city" | "settings";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "overview", label: "Overview" },
@@ -30,6 +31,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "ownership", label: "Ownership" },
   { id: "commits", label: "Commits" },
   { id: "city", label: "City" },
+  { id: "settings", label: "Settings" },
 ];
 
 export default function App() {
@@ -38,9 +40,21 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [repoPath, setRepoPath] = useState("");
   const [diffSha, setDiffSha] = useState<string | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [recents, setRecents] = useState<RecentRepo[]>(getRecents);
   const [tab, setTab] = useState<Tab>("overview");
   const headerRef = useRef<HeaderHandle>(null);
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.has_openai_key && !data.has_anthropic_key) {
+          setShowOnboarding(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleAnalyze = useCallback(async (repo: string, branch: string, maxCommits: number) => {
     setLoading(true);
@@ -84,9 +98,9 @@ export default function App() {
     <div className="app">
       <Header ref={headerRef} onAnalyze={handleAnalyze} onReset={handleReset} loading={loading} />
 
-      {data && (
+      {(data || tab === "settings") && (
         <nav className="tab-bar">
-          {TABS.map((t) => (
+          {TABS.filter((t) => data || t.id === "settings").map((t) => (
             <button
               key={t.id}
               className={`tab-btn ${tab === t.id ? "tab-btn--active" : ""}`}
@@ -99,7 +113,7 @@ export default function App() {
       )}
 
       <main className={tab === "city" && data ? "container container--full" : "container"}>
-        {!data && (
+        {!data && tab !== "settings" && (
           <EmptyState
             loading={loading}
             error={error}
@@ -157,10 +171,22 @@ export default function App() {
         {data && tab === "city" && (
           <CodeCity commits={data.commits} />
         )}
+
+        {tab === "settings" && (
+          <Settings />
+        )}
       </main>
 
       {diffSha && repoPath && (
         <DiffViewer repoPath={repoPath} sha={diffSha} onClose={() => setDiffSha(null)} />
+      )}
+
+      {showOnboarding && (
+        <div className="onboarding-overlay">
+          <div className="onboarding-modal">
+            <Settings isOnboarding onSaved={() => setShowOnboarding(false)} />
+          </div>
+        </div>
       )}
     </div>
   );

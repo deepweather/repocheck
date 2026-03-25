@@ -335,24 +335,86 @@ def _llm_classify_batch(
         return batch_idx, []
 
 
+def _anthropic_classify_batch(
+    api_key: str,
+    commits: list[CommitData],
+    model: str,
+    batch_idx: int,
+    total_batches: int,
+) -> tuple[int, list[dict]]:
+    """Classify using Anthropic's API."""
+    import anthropic
+
+    log.info(
+        "  Anthropic batch %d/%d (%d commits)",
+        batch_idx + 1,
+        total_batches,
+        len(commits),
+    )
+
+    user_content = "\n\n---\n\n".join(
+        f"SHA: {c.short_sha}\nAuthor: {c.author_name}\nDate: {c.authored_date.isoformat()}\n"
+        f"Message: {c.message[:300]}\n"
+        f"Files ({c.total_files_changed}): {c.file_paths_str}\n"
+        f"Stats: +{c.total_insertions} -{c.total_deletions}"
+        for c in commits
+    )
+
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
+        resp = client.messages.create(
+            model=model,
+            max_tokens=4096,
+            system=_SYSTEM_PROMPT + "\n\nReturn ONLY valid JSON, no markdown fences.",
+            messages=[{"role": "user", "content": user_content}],
+        )
+        raw = resp.content[0].text
+        parsed = json.loads(raw)
+        if isinstance(parsed, dict):
+            parsed = (
+                parsed.get("commits")
+                or parsed.get("results")
+                or list(parsed.values())[0]
+            )
+        return batch_idx, (parsed if isinstance(parsed, list) else [])
+    except Exception as e:
+        log.warning("Anthropic batch %d failed: %s", batch_idx + 1, e)
+        return batch_idx, []
+
+
 def classify_commits(
     commits: list[CommitData],
     openai_api_key: str | None = None,
     model: str = "gpt-4o-mini",
+    provider: str = "openai",
+    anthropic_api_key: str | None = None,
     progress_callback=None,
 ) -> list[ClassifiedCommit]:
     """Classify all commits. Uses LLM in parallel if key provided, else heuristic."""
 
-    api_key = openai_api_key or os.environ.get("OPENAI_API_KEY")
+    # Resolve provider and key
+    if provider == "anthropic" and anthropic_api_key:
+        api_key = anthropic_api_key
+    else:
+        api_key = openai_api_key or os.environ.get("OPENAI_API_KEY")
+        provider = "openai"
 
     if not api_key:
-        log.info("No OpenAI API key — using heuristic classification")
+        log.info("No API key — using heuristic classification")
         return _heuristic_batch(commits)
 
     log.info(
-        "Classifying %d commits with %s (%d workers)", len(commits), model, MAX_WORKERS
+        "Classifying %d commits with %s/%s (%d workers)",
+        len(commits),
+        provider,
+        model,
+        MAX_WORKERS,
     )
-    client = OpenAI(api_key=api_key)
+
+    classify_fn = (
+        _llm_classify_batch if provider == "openai" else _anthropic_classify_batch
+    )
+    client_or_key = OpenAI(api_key=api_key) if provider == "openai" else api_key
 
     batches: list[tuple[int, list[CommitData]]] = []
     for i in range(0, len(commits), BATCH_SIZE):
@@ -364,7 +426,7 @@ def classify_commits(
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:
         futures = {
             pool.submit(
-                _llm_classify_batch, client, batch, model, idx, total_batches
+                classify_fn, client_or_key, batch, model, idx, total_batches
             ): idx
             for idx, batch in batches
         }
