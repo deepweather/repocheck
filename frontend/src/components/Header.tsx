@@ -3,6 +3,7 @@ import { browsePath, fetchBranches, type BrowseEntry } from "../api";
 
 interface Props {
   onAnalyze: (repo: string, branch: string, maxCommits: number) => void;
+  onReset: () => void;
   loading: boolean;
 }
 
@@ -17,7 +18,7 @@ const COMMIT_PRESETS = [
   { label: "5k", value: 5000 },
 ];
 
-const Header = forwardRef<HeaderHandle, Props>(function Header({ onAnalyze, loading }, ref) {
+const Header = forwardRef<HeaderHandle, Props>(function Header({ onAnalyze, onReset, loading }, ref) {
   const [repo, setRepo] = useState("");
   const [branch, setBranch] = useState("");
   const [maxCommits, setMaxCommits] = useState(1000);
@@ -114,9 +115,9 @@ const Header = forwardRef<HeaderHandle, Props>(function Header({ onAnalyze, load
 
   return (
     <header className="header">
-      <div className="logo">
+      <a className="logo" onClick={onReset}>
         repo<span>check</span>
-      </div>
+      </a>
       <form className="input-row" onSubmit={submit}>
         <div className="input-wrapper">
           <div className="input-with-btn">

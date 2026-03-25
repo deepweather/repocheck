@@ -53,6 +53,7 @@ export interface RepoMetrics {
   weekly_timeline: Record<string, WeeklyData>;
   commit_type_distribution: Record<string, number>;
   commits: CommitInfo[];
+  analytics: Analytics;
 }
 
 export interface CommitInfo {
@@ -82,6 +83,89 @@ export interface DiffResult {
   date: string;
   stat: string;
   diff: string;
+}
+
+// --- Analytics types ---
+
+export interface CadenceStats {
+  median_gap_hours: number;
+  p90_gap_hours: number;
+  max_gap_days: number;
+  burst_ratio: number;
+}
+
+export interface ContributorTemporal {
+  author_id: string;
+  name: string;
+  weekday_hour: number[][];
+  cadence: CadenceStats;
+  weekly_commits: Record<string, number>;
+  weekly_features: Record<string, number>;
+  velocity_trend: { week: string; commits: number; features: number }[];
+}
+
+export interface TemporalPatterns {
+  weekday_hour: number[][];
+  per_contributor: ContributorTemporal[];
+}
+
+export interface BugLatency {
+  median_hours: number;
+  p90_hours: number;
+  per_contributor: Record<string, number>;
+}
+
+export interface FileOwnershipInfo {
+  path: string;
+  contributors: number;
+  top_contributor: string;
+  total_changes: number;
+  bug_changes: number;
+}
+
+export interface DirectoryOwnershipInfo {
+  path: string;
+  contributors: number;
+  top_contributors: { name: string; lines: number }[];
+  total_lines: number;
+}
+
+export interface OwnershipAnalysis {
+  bus_factor_1_pct: number;
+  total_files_analyzed: number;
+  hotspot_files: FileOwnershipInfo[];
+  directory_ownership: DirectoryOwnershipInfo[];
+}
+
+export interface WeeklyHealth {
+  week: string;
+  bug_ratio: number;
+  velocity: number;
+  features: number;
+  bugfixes: number;
+  complexity_avg: number;
+  contributors_active: number;
+}
+
+export interface AttritionFlag {
+  author_id: string;
+  name: string;
+  recent_velocity: number;
+  historical_velocity: number;
+  drop_pct: number;
+}
+
+export interface HealthTrends {
+  weekly: WeeklyHealth[];
+  attrition_flags: AttritionFlag[];
+  commit_size_distribution: Record<string, number>;
+}
+
+export interface Analytics {
+  temporal: TemporalPatterns;
+  bug_latency: BugLatency;
+  ownership: OwnershipAnalysis;
+  health: HealthTrends;
 }
 
 export type SortKey =

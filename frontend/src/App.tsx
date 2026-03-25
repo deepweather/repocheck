@@ -14,6 +14,10 @@ import {
 import Leaderboard from "./components/Leaderboard";
 import CommitList from "./components/CommitList";
 import DiffViewer from "./components/DiffViewer";
+import Patterns from "./components/Patterns";
+import Ownership from "./components/Ownership";
+import Compare from "./components/Compare";
+import Health from "./components/Health";
 
 export default function App() {
   const [data, setData] = useState<RepoMetrics | null>(null);
@@ -43,9 +47,16 @@ export default function App() {
     }
   }, []);
 
+  const handleReset = useCallback(() => {
+    setData(null);
+    setError(null);
+    setRepoPath("");
+  }, []);
+
   const handleSelectRepo = useCallback((path: string) => {
     headerRef.current?.setRepoAndLoad(path);
-  }, []);
+    handleAnalyze(path, "", 1000);
+  }, [handleAnalyze]);
 
   const handleSelectRecent = useCallback((r: RecentRepo) => {
     headerRef.current?.setRepoAndLoad(r.path);
@@ -56,7 +67,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <Header ref={headerRef} onAnalyze={handleAnalyze} loading={loading} />
+      <Header ref={headerRef} onAnalyze={handleAnalyze} onReset={handleReset} loading={loading} />
 
       <main className="container">
         {!data && (
@@ -88,6 +99,15 @@ export default function App() {
               commits={reversedCommits}
               onSelectCommit={setDiffSha}
             />
+
+            {data.analytics && (
+              <>
+                <Compare contributors={data.contributors} />
+                <Patterns temporal={data.analytics.temporal} />
+                <Health health={data.analytics.health} />
+                <Ownership ownership={data.analytics.ownership} />
+              </>
+            )}
 
             <CommitList
               commits={reversedCommits}

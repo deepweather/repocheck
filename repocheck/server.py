@@ -15,6 +15,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, Response
 from git import Repo
 from git.exc import GitCommandError
 
+from .analytics import compute_all_analytics
 from .cache import get_cached, put_cache, clear_cache
 from .classifier import classify_commits
 from .extractor import extract_commits
@@ -93,6 +94,7 @@ def analyze(
     result = json.loads(json.dumps(asdict(metrics), default=_json_serial))
 
     result["commits"] = _build_commit_list(classified)
+    result["analytics"] = compute_all_analytics(classified)
 
     put_cache(repo_str, branch, max_commits, result)
 
