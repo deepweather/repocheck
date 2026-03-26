@@ -1,62 +1,111 @@
-# repocheck
+<p align="center">
+  <h1 align="center">repocheck</h1>
+  <p align="center">AI-powered git analytics that measures what actually matters.</p>
+</p>
 
-Git analytics that measures what actually matters. Classifies every commit with AI, computes developer impact, reliability, and efficiency — not vanity metrics like lines of code.
+<p align="center">
+  <a href="https://github.com/deepweather/repocheck/releases/latest"><img src="https://img.shields.io/github/v/release/deepweather/repocheck?label=Download&style=for-the-badge&color=6c5ce7" alt="Download"></a>
+  <a href="https://github.com/deepweather/repocheck/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="License"></a>
+  <a href="https://github.com/deepweather/repocheck"><img src="https://img.shields.io/github/stars/deepweather/repocheck?style=for-the-badge&color=fdcb6e" alt="Stars"></a>
+</p>
 
-![Overview](docs/screenshots/02-overview.png)
+<p align="center">
+  <a href="https://github.com/deepweather/repocheck/releases/latest"><strong>Download for macOS</strong></a> · <a href="#run-from-source">Run from source</a> · <a href="#features">Features</a>
+</p>
+
+<br>
+
+<p align="center">
+  <img src="docs/screenshots/02-overview.png" width="800" alt="repocheck dashboard">
+</p>
+
+---
+
+Point repocheck at any local git repository. It classifies every commit with AI (OpenAI or Anthropic), then computes per-developer **impact, reliability, velocity, and efficiency** — not vanity metrics like lines of code.
+
+## Download
+
+| Platform | Install |
+|----------|---------|
+| **macOS** | [Download .dmg](https://github.com/deepweather/repocheck/releases/latest) — drag to Applications, launch |
+| **Linux / Windows** | [Run from source](#run-from-source) — Python + Node.js |
 
 ## Features
 
-- **AI commit classification** — OpenAI or Anthropic classifies each commit as feature, bugfix, refactor, chore, etc.
-- **Developer leaderboard** — impact score, reliability, velocity, efficiency per contributor
-- **Temporal patterns** — weekday/hour heatmap with drill-down to actual commits
-- **Code ownership** — bus factor, bug hotspot files, knowledge map by directory
-- **Health trends** — bug ratio, complexity, attrition signals over time
-- **Contributor comparison** — radar chart overlay for side-by-side analysis
-- **3D code city** — Three.js visualization of the codebase, height by commits/lines/recency/bugs
-- **Commit drill-down** — full commit list with filters, search, and diff viewer
-- **Cmd+K command palette** — search tabs, contributors, commits from anywhere
-- **Persistent disk cache** — re-analysis is instant, invalidates on new commits
-- **Desktop app** — Electron .dmg for macOS with native menu bar
+<table>
+<tr>
+<td width="50%">
 
-### Contributors
+**Developer leaderboard** — ranked by impact score with reliability, velocity, efficiency metrics. Expandable cards show full commit history per contributor.
 
-![Contributors](docs/screenshots/04-contributors.png)
+</td>
+<td width="50%">
 
-### Patterns
+<img src="docs/screenshots/04-contributors.png" alt="Contributors">
 
-![Patterns](docs/screenshots/03-patterns.png)
+</td>
+</tr>
+<tr>
+<td width="50%">
 
-## Install
+<img src="docs/screenshots/03-patterns.png" alt="Patterns">
+
+</td>
+<td width="50%">
+
+**Commit heatmap** — weekday x hour activity grid. Click any cell to see exactly which commits happened, who authored them, and what type they are.
+
+</td>
+</tr>
+</table>
+
+- **AI commit classification** — every commit tagged as feature, bugfix, refactor, chore, docs, etc.
+- **Code ownership** — bus factor per directory, bug hotspot files, knowledge map
+- **Health trends** — bug ratio, complexity, and attrition signals over time
+- **Contributor comparison** — radar chart for side-by-side analysis
+- **3D code city** — Three.js visualization where each file is a building, height = activity
+- **Diff viewer** — click any commit to see the full diff with syntax highlighting
+- **Cmd+K palette** — search tabs, contributors, commits from anywhere
+- **Persistent cache** — re-analysis is instant, auto-invalidates on new commits
+- **Supports OpenAI and Anthropic** — configure in Settings, keys persist locally
+
+## Run from source
 
 ```bash
 git clone https://github.com/deepweather/repocheck.git
 cd repocheck
 
-# Python backend
+# Backend
 pip install -r requirements.txt
 
-# React frontend
+# Frontend
 cd frontend && npm install && npm run build && cd ..
 
 # Run
 python run.py
 ```
 
-Open `http://localhost:8484`. Select a repo and hit Analyze.
+Open [localhost:8484](http://localhost:8484). Set your API key in Settings (optional — works without using heuristic classification).
 
-Configure API keys in the Settings tab or via environment:
+## How it works
 
-```bash
-export OPENAI_API_KEY=sk-...
-# or
-export ANTHROPIC_API_KEY=sk-ant-...
-```
+1. **Extract** — reads git log via GitPython (commit metadata + file stats)
+2. **Classify** — sends commits in parallel batches to OpenAI/Anthropic for semantic classification
+3. **Compute** — calculates impact, reliability, velocity, efficiency, ownership, temporal patterns
+4. **Visualize** — React + TypeScript dashboard with Chart.js and Three.js
 
-Keys persist at `~/.repocheck/config.json` when saved in Settings.
+## Metrics
 
-## Desktop App
+| Metric | What it measures |
+|--------|-----------------|
+| Impact | Weighted composite: features x3, bugs x1, refactors x0.5, penalized by unreliability |
+| Reliability | How rarely your features need bugfixes within 14 days |
+| Efficiency | Features shipped per 1000 lines of code changed |
+| Velocity | Commits and features per active week |
+| Bus factor | % of files touched by only one contributor |
+| Bug latency | Median hours from feature commit to first bugfix on same files |
 
-Download the [latest .dmg from Releases](https://github.com/deepweather/repocheck/releases), or build it:
+## Build desktop app
 
 ```bash
 pip install pyinstaller
@@ -64,40 +113,20 @@ npm install
 ./scripts/build-desktop.sh
 ```
 
-## Architecture
+Produces `dist/repocheck-0.1.0.dmg` (~105MB).
 
-```
-repocheck/
-  extractor.py    — git log extraction (metadata + file stats)
-  classifier.py   — OpenAI/Anthropic batch classification + heuristic fallback
-  metrics.py      — per-contributor and repo-wide metric computation
-  analytics.py    — temporal patterns, ownership, health trends, comparisons
-  cache.py        — persistent disk cache keyed by repo + HEAD SHA
-  config.py       — user settings at ~/.repocheck/config.json
-  server.py       — FastAPI serving API + React frontend
-frontend/
-  src/components/  — React + TypeScript with Chart.js and Three.js
-electron/
-  main.js          — Electron shell for macOS desktop app
-```
-
-## Metrics
-
-| Metric | Description |
-|---|---|
-| **Impact** | Features x3 + bugs x1 + refactors x0.5, penalized by unreliability |
-| **Reliability** | 1 - (features needing bugfixes within 14 days / total features) |
-| **Efficiency** | Features shipped per 1000 lines changed |
-| **Velocity** | Commits and features per active week |
-| **Bug latency** | Median hours from feature to first bugfix on same files |
-| **Bus factor** | % of files touched by only one contributor |
-
-## Tests
+## Development
 
 ```bash
-pip install pytest ruff
-python -m pytest tests/ -v   # 52 tests
-ruff check repocheck/        # lint
+# Run backend
+python run.py --no-browser --port 8484
+
+# Run frontend dev server (hot reload)
+cd frontend && npm run dev
+
+# Tests
+python -m pytest tests/ -v    # 52 tests
+ruff check repocheck/         # lint
 ```
 
 ## License
