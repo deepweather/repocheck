@@ -43,6 +43,7 @@ export default function App() {
   const [diffSha, setDiffSha] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showPalette, setShowPalette] = useState(false);
+  const [loadingStarted, setLoadingStarted] = useState(0);
   const [recents, setRecents] = useState<RecentRepo[]>(getRecents);
   const [tab, setTabState] = useState<Tab>(() => {
     const hash = window.location.hash.replace("#", "") as Tab;
@@ -80,8 +81,12 @@ export default function App() {
     setData(null);
     setRepoPath(repo);
     setTab("overview");
+    setLoadingStarted(Date.now());
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 300000);
       const result = await analyzeRepo(repo, branch || undefined, maxCommits);
+      clearTimeout(timeout);
       setData(result);
       const name = repo.split("/").pop() || repo;
       const recent: RecentRepo = { path: repo, name, branch, maxCommits, analyzedAt: Date.now() };
@@ -108,7 +113,7 @@ export default function App() {
 
   const handleSelectRecent = useCallback((r: RecentRepo) => {
     headerRef.current?.setRepoAndLoad(r.path);
-    handleAnalyze(r.path, r.branch, r.maxCommits);
+    handleAnalyze(r.path, r.branch, Math.min(r.maxCommits, 1000));
   }, [handleAnalyze]);
 
   const reversedCommits = data?.commits ? [...data.commits].reverse() : [];
@@ -135,6 +140,7 @@ export default function App() {
         {!data && tab !== "settings" && (
           <EmptyState
             loading={loading}
+            loadingStarted={loadingStarted}
             error={error}
             onSelectRepo={handleSelectRepo}
             recents={recents}

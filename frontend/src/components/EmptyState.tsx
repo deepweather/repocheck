@@ -4,6 +4,7 @@ import type { RecentRepo } from "../recents";
 
 interface Props {
   loading: boolean;
+  loadingStarted: number;
   error: string | null;
   onSelectRepo: (path: string) => void;
   recents: RecentRepo[];
@@ -21,8 +22,15 @@ function timeAgo(ts: number): string {
   return `${days}d ago`;
 }
 
-export default function EmptyState({ loading, error, onSelectRepo, recents, onSelectRecent }: Props) {
+export default function EmptyState({ loading, loadingStarted, error, onSelectRepo, recents, onSelectRecent }: Props) {
   const [repos, setRepos] = useState<BrowseEntry[]>([]);
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    if (!loading || !loadingStarted) { setElapsed(0); return; }
+    const interval = setInterval(() => setElapsed(Math.floor((Date.now() - loadingStarted) / 1000)), 1000);
+    return () => clearInterval(interval);
+  }, [loading, loadingStarted]);
 
   useEffect(() => {
     if (!loading && !error) {
@@ -49,7 +57,7 @@ export default function EmptyState({ loading, error, onSelectRepo, recents, onSe
       <div className="loading-view">
         <div className="loading-view__status">
           <div className="spinner" />
-          <span>Analyzing repository…</span>
+          <span>Analyzing repository… {elapsed > 0 && `${elapsed}s`}</span>
         </div>
         <div className="skeleton-container">
           <div className="skeleton-grid">
