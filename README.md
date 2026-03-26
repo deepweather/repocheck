@@ -1,6 +1,6 @@
 <p align="center">
   <h1 align="center">repocheck</h1>
-  <p align="center">AI-powered git analytics that measures what actually matters.</p>
+  <p align="center">Git analytics for engineering teams. Classify commits, track developer output, spot risks.</p>
 </p>
 
 <p align="center">
@@ -21,14 +21,14 @@
 
 ---
 
-Point repocheck at any local git repository. It classifies every commit with AI (OpenAI or Anthropic), then computes per-developer **impact, reliability, velocity, and efficiency** — not vanity metrics like lines of code.
+Point repocheck at any local git repo. It uses OpenAI or Anthropic to classify every commit (feature, bugfix, refactor, chore, ...), then computes per-developer impact, reliability, velocity, and efficiency.
 
 ## Download
 
 | Platform | Install |
 |----------|---------|
-| **macOS** | [Download .dmg](https://github.com/deepweather/repocheck/releases/latest) — drag to Applications, launch |
-| **Linux / Windows** | [Run from source](#run-from-source) — Python + Node.js |
+| **macOS** | [Download .dmg](https://github.com/deepweather/repocheck/releases/latest), drag to Applications, launch |
+| **Linux / Windows** | [Run from source](#run-from-source) (Python + Node.js) |
 
 ## Features
 
@@ -36,7 +36,7 @@ Point repocheck at any local git repository. It classifies every commit with AI 
 <tr>
 <td width="50%">
 
-**Developer leaderboard** — ranked by impact score with reliability, velocity, efficiency metrics. Expandable cards show full commit history per contributor.
+**Developer leaderboard.** Ranked by impact score. Shows reliability, velocity, efficiency. Expand a card to see that person's full commit history.
 
 </td>
 <td width="50%">
@@ -53,21 +53,21 @@ Point repocheck at any local git repository. It classifies every commit with AI 
 </td>
 <td width="50%">
 
-**Commit heatmap** — weekday x hour activity grid. Click any cell to see exactly which commits happened, who authored them, and what type they are.
+**Commit heatmap.** Activity by weekday and hour. Click a cell to see the commits, authors, and types for that time slot.
 
 </td>
 </tr>
 </table>
 
-- **AI commit classification** — every commit tagged as feature, bugfix, refactor, chore, docs, etc.
-- **Code ownership** — bus factor per directory, bug hotspot files, knowledge map
-- **Health trends** — bug ratio, complexity, and attrition signals over time
-- **Contributor comparison** — radar chart for side-by-side analysis
-- **3D code city** — Three.js visualization where each file is a building, height = activity
-- **Diff viewer** — click any commit to see the full diff with syntax highlighting
-- **Cmd+K palette** — search tabs, contributors, commits from anywhere
-- **Persistent cache** — re-analysis is instant, auto-invalidates on new commits
-- **Supports OpenAI and Anthropic** — configure in Settings, keys persist locally
+- **Commit classification** using OpenAI or Anthropic (feature, bugfix, refactor, chore, docs, test, ...)
+- **Code ownership** with bus factor, bug hotspot files, knowledge map per directory
+- **Health trends** showing bug ratio, complexity, and attrition signals week over week
+- **Contributor comparison** via radar chart overlay
+- **3D code city** (Three.js) where each file is a block, height based on commits/lines/recency/bugs
+- **Diff viewer** for any commit, with real line numbers
+- **Cmd+K** to search tabs, contributors, commits
+- **Disk cache** keyed by repo + HEAD SHA, instant on repeat visits
+- **OpenAI + Anthropic** support, configurable in Settings
 
 ## Run from source
 
@@ -75,37 +75,33 @@ Point repocheck at any local git repository. It classifies every commit with AI 
 git clone https://github.com/deepweather/repocheck.git
 cd repocheck
 
-# Backend
 pip install -r requirements.txt
-
-# Frontend
 cd frontend && npm install && npm run build && cd ..
 
-# Run
 python run.py
 ```
 
-Open [localhost:8484](http://localhost:8484). Set your API key in Settings (optional — works without using heuristic classification).
+Opens at [localhost:8484](http://localhost:8484). API key is optional (set in Settings tab or `export OPENAI_API_KEY=...`). Without a key, classification falls back to regex heuristics.
 
 ## How it works
 
-1. **Extract** — reads git log via GitPython (commit metadata + file stats)
-2. **Classify** — sends commits in parallel batches to OpenAI/Anthropic for semantic classification
-3. **Compute** — calculates impact, reliability, velocity, efficiency, ownership, temporal patterns
-4. **Visualize** — React + TypeScript dashboard with Chart.js and Three.js
+1. **Extract** reads git log (commit metadata + file stats, no diffs)
+2. **Classify** sends batches to OpenAI/Anthropic in parallel for commit type classification
+3. **Compute** calculates impact, reliability, velocity, efficiency, ownership, temporal patterns
+4. **Serve** React + TypeScript frontend with Chart.js and Three.js
 
 ## Metrics
 
-| Metric | What it measures |
-|--------|-----------------|
-| Impact | Weighted composite: features x3, bugs x1, refactors x0.5, penalized by unreliability |
-| Reliability | How rarely your features need bugfixes within 14 days |
-| Efficiency | Features shipped per 1000 lines of code changed |
-| Velocity | Commits and features per active week |
-| Bus factor | % of files touched by only one contributor |
-| Bug latency | Median hours from feature commit to first bugfix on same files |
+| Metric | Description |
+|--------|-------------|
+| Impact | features x3 + bugs x1 + refactors x0.5, penalized by unreliability |
+| Reliability | 1 - (features that needed a bugfix within 14 days / total features) |
+| Efficiency | features / lines changed x 1000 |
+| Velocity | commits per active week |
+| Bus factor | % of files with only one contributor |
+| Bug latency | median hours from feature to first bugfix on the same files |
 
-## Build desktop app
+## Build the desktop app
 
 ```bash
 pip install pyinstaller
@@ -113,20 +109,16 @@ npm install
 ./scripts/build-desktop.sh
 ```
 
-Produces `dist/repocheck-0.1.0.dmg` (~105MB).
+Output: `dist/repocheck-0.1.0.dmg` (~105MB).
 
 ## Development
 
 ```bash
-# Run backend
-python run.py --no-browser --port 8484
+python run.py --no-browser --port 8484   # backend
+cd frontend && npm run dev               # frontend with hot reload
 
-# Run frontend dev server (hot reload)
-cd frontend && npm run dev
-
-# Tests
-python -m pytest tests/ -v    # 52 tests
-ruff check repocheck/         # lint
+python -m pytest tests/ -v               # 52 tests
+ruff check repocheck/                    # lint
 ```
 
 ## License
