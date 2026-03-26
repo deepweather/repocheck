@@ -68,13 +68,13 @@ export default function Health({ health }: Props) {
       labels: weeks,
       datasets: [{
         data: health.weekly.map((w) => w.complexity_avg),
-        borderColor: "#8b7cf6",
-        backgroundColor: "rgba(139,124,246,0.06)",
+        borderColor: "#e09145",
+        backgroundColor: "rgba(224,145,69,0.06)",
         fill: true,
         tension: 0.3,
         pointRadius: 0,
         pointHoverRadius: 4,
-        pointHoverBackgroundColor: "#8b7cf6",
+        pointHoverBackgroundColor: "#e09145",
         borderWidth: 2,
       }],
     },
@@ -101,7 +101,7 @@ export default function Health({ health }: Props) {
       datasets: [{
         data: sizeEntries.map(([, v]) => v),
         backgroundColor: sizeEntries.map(([k]) => {
-          const colors: Record<string, string> = { trivial: "#3a3a44", small: "#4a4a56", medium: "#8b7cf6", large: "#a498ff", massive: "#f47067" };
+          const colors: Record<string, string> = { trivial: "#3a3a44", small: "#4a4a56", medium: "#e09145", large: "#f0a860", massive: "#f47067" };
           return colors[k] || "#4a4a56";
         }),
         borderRadius: 3,

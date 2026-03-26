@@ -3,7 +3,7 @@ import type { CommitInfo, ContributorMetrics } from "../types";
 import CommitList from "./CommitList";
 
 const TYPE_COLORS: Record<string, string> = {
-  feature: "#8b7cf6",
+  feature: "#e09145",
   bugfix: "#f47067",
   refactor: "#56d4c8",
   docs: "#5e5e6e",

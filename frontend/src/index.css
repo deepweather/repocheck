@@ -10,9 +10,9 @@
   --text: #ececf0;
   --text-secondary: #9494a0;
   --text-tertiary: #5e5e6e;
-  --accent: #8b7cf6;
-  --accent-dim: rgba(139,124,246,0.12);
-  --accent-strong: #a498ff;
+  --accent: #e09145;
+  --accent-dim: rgba(224,145,69,0.12);
+  --accent-strong: #f0a860;
   --green: #34d399;
   --green-dim: rgba(52,211,153,0.12);
   --red: #f47067;
@@ -276,10 +276,10 @@ body {
 .btn-primary {
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 1px 4px rgba(139,124,246,0.3);
+  box-shadow: 0 1px 4px rgba(224,145,69,0.3);
 }
 
-.btn-primary:hover { box-shadow: 0 4px 12px rgba(139,124,246,0.3); }
+.btn-primary:hover { box-shadow: 0 4px 12px rgba(224,145,69,0.3); }
 
 /* ================================================================
    TAB BAR

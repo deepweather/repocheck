@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import type { CommitInfo } from "../types";
 
 const TYPE_COLORS: Record<string, string> = {
-  feature: "rgba(139,124,246,0.2)",
+  feature: "rgba(224,145,69,0.2)",
   bugfix: "rgba(244,112,103,0.2)",
   refactor: "rgba(86,212,200,0.15)",
   docs: "rgba(94,94,110,0.2)",
@@ -15,7 +15,7 @@ const TYPE_COLORS: Record<string, string> = {
 };
 
 const TYPE_TEXT_COLORS: Record<string, string> = {
-  feature: "#a498ff",
+  feature: "#f0a860",
   bugfix: "#f47067",
   refactor: "#56d4c8",
   docs: "#9494a0",

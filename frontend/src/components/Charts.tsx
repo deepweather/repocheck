@@ -4,7 +4,7 @@ import type { RepoMetrics } from "../types";
 declare const Chart: any;
 
 const TYPE_COLORS: Record<string, string> = {
-  feature: "#8b7cf6",
+  feature: "#e09145",
   bugfix: "#f47067",
   refactor: "#56d4c8",
   docs: "#5e5e6e",
@@ -100,7 +100,7 @@ export function VelocityChart({ data }: Props) {
         {
           label: "Commits",
           data: weeks.map((w) => data.weekly_timeline[w].commits),
-          backgroundColor: "rgba(139,124,246,0.5)",
+          backgroundColor: "rgba(224,145,69,0.5)",
           borderRadius: 3,
           yAxisID: "y",
         },
@@ -108,7 +108,7 @@ export function VelocityChart({ data }: Props) {
           label: "Lines changed",
           data: weeks.map((w) => data.weekly_timeline[w].insertions + data.weekly_timeline[w].deletions),
           type: "line",
-          borderColor: "rgba(139,124,246,0.25)",
+          borderColor: "rgba(224,145,69,0.25)",
           borderWidth: 1.5,
           pointRadius: 0,
           tension: 0.35,
@@ -149,8 +149,8 @@ export function FeatureBugChart({ data }: Props) {
         {
           label: "Features",
           data: weeks.map((w) => data.weekly_timeline[w].features),
-          borderColor: "#8b7cf6",
-          backgroundColor: "rgba(139,124,246,0.06)",
+          borderColor: "#e09145",
+          backgroundColor: "rgba(224,145,69,0.06)",
           fill: true,
           tension: 0.35,
           pointRadius: 0,
@@ -198,7 +198,7 @@ export function ImpactChart({ data }: Props) {
       datasets: [{
         label: "Impact",
         data: scores,
-        backgroundColor: scores.map((_, i) => `rgba(139,124,246,${0.8 - i * 0.05})`),
+        backgroundColor: scores.map((_, i) => `rgba(224,145,69,${0.8 - i * 0.05})`),
         borderRadius: 3,
       }],
     },

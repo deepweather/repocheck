@@ -16,7 +16,7 @@ const DIMS = [
 ] as const;
 
 const COLORS = [
-  { border: "rgba(139,124,246,0.8)", bg: "rgba(139,124,246,0.15)" },
+  { border: "rgba(224,145,69,0.8)", bg: "rgba(224,145,69,0.15)" },
   { border: "rgba(244,112,103,0.8)", bg: "rgba(244,112,103,0.15)" },
   { border: "rgba(52,211,153,0.8)", bg: "rgba(52,211,153,0.15)" },
   { border: "rgba(229,184,68,0.8)", bg: "rgba(229,184,68,0.15)" },

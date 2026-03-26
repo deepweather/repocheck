@@ -1,10 +1,13 @@
 <p align="center">
+  <img src="docs/logo.png" width="120" alt="repocheck">
+</p>
+<p align="center">
   <h1 align="center">repocheck</h1>
   <p align="center">Git analytics for engineering teams. Classify commits, track developer output, spot risks.</p>
 </p>
 
 <p align="center">
-  <a href="https://github.com/deepweather/repocheck/releases/latest"><img src="https://img.shields.io/github/v/release/deepweather/repocheck?label=Download&style=for-the-badge&color=6c5ce7" alt="Download"></a>
+  <a href="https://github.com/deepweather/repocheck/releases/latest"><img src="https://img.shields.io/github/v/release/deepweather/repocheck?label=Download&style=for-the-badge&color=e09145" alt="Download"></a>
   <a href="https://github.com/deepweather/repocheck/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="License"></a>
   <a href="https://github.com/deepweather/repocheck"><img src="https://img.shields.io/github/stars/deepweather/repocheck?style=for-the-badge&color=fdcb6e" alt="Stars"></a>
 </p>
